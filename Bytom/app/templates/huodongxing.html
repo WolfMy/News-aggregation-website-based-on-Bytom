@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block app_content %}
+	{% for item in items %}
+		<div>
+			<div>
+				<div>
+					<a href="{{ item.url }}"><br><h5 style="color:black">{{item.title}}</h5></a>
+				</div>
+			</div>
+			<div>
+				<span class="small">Place:{{item.place}}</span>
+				<span class="small">Update:{{item.datestamp}}</span>				
+			</div>
+		</div>
+	{% endfor %}
+{% endblock %}

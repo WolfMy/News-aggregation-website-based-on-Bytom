@@ -1,9 +1,9 @@
 {% extends "base.html" %}
-
 {% block app_content %}
-<ul>
-{% for item in items %}
-<li>{{ item.content }}</li>
-{% endfor %}		
-</ul>
+	{% for item in items %}
+		<div class="well well-sm">
+			<p>{{ item.content }}</p>
+		</div>
+		
+	{% endfor %}
 {% endblock %}

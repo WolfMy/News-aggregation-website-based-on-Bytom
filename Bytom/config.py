@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-05-03 22:27:05
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-03 23:10:14
+# @Last Modified time: 2019-05-07 01:15:04
 import os
 class Config:
 	# #首先去读取环境变量的值，如果没有，则使用硬编码字符串作为替代
