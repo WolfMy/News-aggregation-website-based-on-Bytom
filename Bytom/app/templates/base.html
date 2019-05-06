@@ -1,0 +1,32 @@
+{% extends 'bootstrap/base.html' %}
+{% block title %}
+    {% if title %}{{ title }} - talkIsCheap{% else %}Welcome to talkIsCheap{% endif %}
+{% endblock %}
+{% block navbar %}
+    <nav>
+        <div class="container">
+            
+            <ul class="nav nav-tabs">
+                <li role="presentation"><a href="{{ url_for('index') }}">talkIsCheap<span class="badge red">42</span></a></li>
+                <li role="presentation"><a href="{{ url_for('index') }}">Home<span class="badge red">42</span></a></li>
+                <li role="presentation"><a href="{{ url_for('weibo') }}">微博<span class="badge">42</span></a></li>
+                <li role="presentation"><a href="{{ url_for('bilibili') }}">B站<span class="badge">42</span></a></li>
+                <li role="presentation"><a href="{{ url_for('jianshu') }}">简书<span class="badge">42</span></a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+{% endblock %}
+{% block content %}
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+{# application content needs to be provided in the app_content block #}
+{% block app_content %}{% endblock %}
+</div>
+{% endblock %}

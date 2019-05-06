@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block app_content %}
+	{% for item in items %}
+		<div>
+			<span class="glyphicon glyphicon-bitcoin">
+				<a href="{{ item.url }}">{{ item.title }}</a>
+			</span>
+			<div>
+				<span class="glyphicon glyphicon-play">{{ item.playnum }}</span>
+			</div>
+		</div>
+	{% endfor %}
+{% endblock %}
