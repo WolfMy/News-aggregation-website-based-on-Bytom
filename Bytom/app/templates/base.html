@@ -14,12 +14,20 @@
             <a class="navbar-brand" href="#">talkIsCheap</a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
+            <ul class="nav navbar-nav ">
                 <li role="presentation"><a href="{{ url_for('index') }}">Home</a></li>
                 <li role="presentation"><a href="{{ url_for('bilibili') }}">B站</a></li>
                 <li role="presentation"><a href="{{ url_for('jianshu') }}">简书</a></li>
                 <li role="presentation"><a href="{{ url_for('weibo') }}">微博</a></li>
                 <li role="presentation"><a href="{{ url_for('huodongxing') }}">活动行</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                
+                {% if current_user.is_anonymous %}
+                    <li  role="presentation"><a href="{{ url_for('login') }}">Login </a></li>
+                {% else %}
+                    <li ><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
             </ul>
         </div>
     </nav>
@@ -46,6 +54,11 @@
             
         </ul>
     </nav>
+</div>
+<div>
     
+    {%- block footer %}
+<footer>&copy; 2016 Awesome, Inc.</footer>
+{%- endblock footer %}
 </div>
 {% endblock %}

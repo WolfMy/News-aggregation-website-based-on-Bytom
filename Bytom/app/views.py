@@ -2,15 +2,17 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:56:18
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-07 01:29:52
+# @Last Modified time: 2019-05-09 02:25:55
 from app import app
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask_pymongo import PyMongo,DESCENDING,ASCENDING
-# from flask_login import login_user, logout_user, current_user, login_required
-from app import app, mongo
-# from app.models import User
-# from werkzeug.urls import url_parse
+from flask_login import login_user, logout_user, current_user, login_required
+from app.forms import LoginForm,RegistrationForm
+from app import app, mongo,db
+from app.models import User
+from werkzeug.urls import url_parse
 from datetime import datetime
+import re
 
 PERPAGE=20
 
@@ -60,6 +62,7 @@ def index():
 
 	return render_template('index.html',items=bilibili)
 
+
 @app.route('/weibo')
 def weibo():
 	page = request.args.get('page', 1, type=int)
@@ -76,9 +79,26 @@ def weibo():
 	else:
 		prev_url = None
 
-	weibo = mongo.db.weibo.find({"content":{"$exists":"true"},"$where":"(this.content.length > 30)"}).sort([('_id', DESCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
+	weibo = mongo.db.weibo.find({"content":{"$exists":"true"},"$where":"(this.content.length > 30)"}).sort([('likenum', ASCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
+	print(type(weibo))
+	info = []
+	for one in weibo:
+		match = re.search(r"(【.*?】)(.*)(http:.{14})",one['content'])
+		if match:
+			title = match.group(1)
+			describe = match.group(2)
+			url = match.group(3)
+			data = {
+				"title":title,
+				"describe":describe,
+				"url":url,
+				"retweet":one["retweet"],
+				"likenum":one["likenum"],
+				"commentnum":one["commentnum"],
 
-	return render_template('weibo.html',items=weibo,next_url=next_url,prev_url=prev_url)
+			}
+			info.append(data)
+	return render_template('weibo.html',items=info,next_url=next_url,prev_url=prev_url)
 
 @app.route('/bilibili')
 def bilibili():                              
@@ -131,3 +151,51 @@ def huodongxing():
 	return render_template('huodongxing.html',items=huodongxing,next_url=next_url,prev_url=prev_url)
 
 
+@app.route('/login', methods = ['GET', 'POST'])
+def login():	
+	#如果已经登陆了，就直接去index，不用重复登录	
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	form = LoginForm()
+	if form.validate_on_submit():
+		user = User.query.filter_by(username=form.username.data).first()
+		#如果用户名不存在 或者 密码错误,就继续留在login
+		if user is None or not user.check_password(form.password.data):
+			flash('用户名或者密码错误')
+			return redirect(url_for('login'))
+		#登录了
+		login_user(user,remember = form.remember_me.data)
+		#url中是视图函数的名字
+		# return redirect(url_for('index'))
+		#如果直接进入login页面，登陆后自动跳转到index
+		next_page = request.args.get('next')
+		#如果登录 URL 没有一个 next 参数
+		#如果登录 URL 的 next 参数被设置成了包含域名的完整路径（安全性）
+		if not next_page or url_parse(next_page).netloc != "":
+			next_page = url_for('index')	
+		#以下处理是：如果是先访问的index 但要求登录 登录完后跳转到next
+		return redirect(next_page)		
+
+	return render_template('login.html',
+		title = 'Sign In',
+		form = form,
+		)
+@app.route('/logout')
+def logout():
+	logout_user()
+	return	redirect(url_for('index'))
+
+@app.route('/register',methods=['GET', 'POST'])
+def register():
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	form = RegistrationForm()
+	if form.validate_on_submit():
+		user = User(username=form.username.data, email=form.email.data)
+		#手动将输入密码放入数据库中
+		user.set_password(form.password.data)
+		db.session.add(user)
+		db.session.commit()
+		flash('Congratulations, you are now a registered user!')
+		return redirect(url_for('login'))
+	return render_template('register.html', title='Register', form=form)

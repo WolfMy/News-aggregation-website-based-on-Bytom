@@ -23,7 +23,8 @@ News aggregation website based on Bytom
   + ~~符合GEEK阅读习惯的样式~~
   + **对信息做适当的分类**
   + Home改为Hot OR Latest
-  + 
+  + 使用echart画图
+  + 用户评论部分
 + 上线
   + 腾讯云或阿里云线上部署
 

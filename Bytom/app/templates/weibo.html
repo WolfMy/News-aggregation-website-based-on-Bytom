@@ -1,9 +1,21 @@
 {% extends "base.html" %}
 {% block app_content %}
 	{% for item in items %}
-		<div class="well well-sm">
-			<p>{{ item.content }}</p>
+		<div>
+			<div>
+				<div>
+				<a href="{{ item.url }}"><br><h5 style="color:black">{{item.title}}</h5></a>
+				</div>
+				<p class="small" style="color: gray">{{item.describe[:50]}}...</p>
+			</div>
+			<div>
+				<span class="glyphicon small glyphicon-play"></span>
+				<small>{{ item.retweet }}</small>
+				<span class="glyphicon small glyphicon-thumbs-up"></span>
+				<small>{{ item.likenum }}</small>
+				<span class="glyphicon small glyphicon-comment"></span>
+				<small>{{ item.commentnum }}</small>
+			</div>
 		</div>
-		
 	{% endfor %}
 {% endblock %}

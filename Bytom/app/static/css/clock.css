@@ -1,0 +1,33 @@
+/*
+* @Author: TD21forever
+* @Date:   2019-05-09 00:23:52
+* @Last Modified by:   TD21forever
+* @Last Modified time: 2019-05-09 01:13:21
+*/
+aside .clock {
+     font-family: 'Gill Sans', 'Gill Sans MT', 'PingFang SC', Calibri, 'Trebuchet MS', sans-serif;
+     display: grid;
+     grid-template-columns: 15% 15% 5% 15% 15% 5% 15% 15%;
+     grid-template-rows: 90px;
+     user-select: none;
+ }
+
+ aside .clock span,
+ aside .clock div {
+     line-height: 90px;
+     font-size: 2.5em;
+     text-align: center;
+ }
+
+ aside .clock span {
+     line-height: 80px;
+ }
+
+ aside .clock div.timeNum {
+     border: 1px #ccc solid;
+     border-radius: 5px;
+     margin: 0 2.5px;
+     box-shadow: 0 0 3px #ccc;
+     background-color: #d6d6d6;
+     transition: transform .3s .2s;
+ }

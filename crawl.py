@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-04-27 19:31:14
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-04 15:57:35
+# @Last Modified time: 2019-05-08 12:23:45
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -14,6 +14,16 @@ huodongxing = Bytom_info_test['huodongxing']
 bilibili = Bytom_info_test['bilibili']
 jianshu = Bytom_info_test['jianshu']
 github = Bytom_info_test['github']
+
+
+import twitterpastcrawler
+
+crawler = twitterpastcrawler.TwitterCrawler(
+							query="#bytom", # searches for tweets that respond to the query, "#haiku"
+							output_file="haiku.csv" # outputs results to haiku.csv
+						)
+
+crawler.crawl() # commences the crawl
 
 
 
@@ -115,11 +125,12 @@ github = Bytom_info_test['github']
 # 	'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36'
 # }
 # BASEURL = "https://www.huodongxing.com/"
-# url = "https://www.huodongxing.com/people/7602880561672?type=pub"
+# url = "https://www.huodongxing.com/people/7602880561672?type=pubdate"
 # response = requests.get(url,headers=headers)
 # soup = BeautifulSoup(response.text,'lxml')
 # infos = soup.select("div.media-body")
 # hrefs = soup.select("a.media")
+# print(hrefs)
 # urls = []
 # for href in hrefs:
 # 	urls.append(href.get('href'))
