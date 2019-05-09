@@ -20,6 +20,7 @@
                 <li role="presentation"><a href="{{ url_for('jianshu') }}">简书</a></li>
                 <li role="presentation"><a href="{{ url_for('weibo') }}">微博</a></li>
                 <li role="presentation"><a href="{{ url_for('huodongxing') }}">活动行</a></li>
+                <li role="presentation"><a href="{{ url_for('github') }}">Github</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
                 
@@ -54,11 +55,10 @@
             
         </ul>
     </nav>
-</div>
-<div>
-    
-    {%- block footer %}
-<footer>&copy; 2016 Awesome, Inc.</footer>
-{%- endblock footer %}
-</div>
+    <footer class="bottom">
+  <div class="container">
+      &copy; 2016 Awesome, Inc
+ </div>
+</footer>
+
 {% endblock %}

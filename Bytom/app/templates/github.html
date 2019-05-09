@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block app_content %}
+	{% for item in items %}
+		<div>
+			<div>
+				<div>
+				<a href="{{ item.urls }}"><br><h4 style="color:black">{{item.title}}</h4></a>
+				</div>
+				<p class="medium" style="color: gray">{{item.describe[:50]}}...</p>
+				<span class="label label-success">{{ item.language }}</span>
+				<span class="label label-success">{{ item.timestamp }}</span>
+
+			</div>
+		</div>
+	{% endfor %}
+{% endblock %}

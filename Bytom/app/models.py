@@ -2,15 +2,17 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:59:38
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-08 11:58:25
+# @Last Modified time: 2019-05-09 11:25:36
 # from app import db
 
 from datetime import datetime
-from app import db
+from app import db,app
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from app import login_manager
 from hashlib import md5
+import jwt
+from time import time
 
 
 
@@ -33,6 +35,20 @@ class User(UserMixin,db.Model):
 	# secondaryjoin=(followers.c.followed_id == id),backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 	# about_me = db.Column(db.String(140))
 	# last_seen = db.Column(db.DateTime, default=datetime.utcnow)
+	def get_reset_password_token(self, expires_in=600):
+		return jwt.encode(
+			{'reset_password': self.id, 'exp': time() + expires_in},
+			app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+		
+	@staticmethod
+	def verify_reset_password_token(token):
+		try:
+			id = jwt.decode(token, app.config['SECRET_KEY'],
+							algorithms=['HS256'])['reset_password']
+		except:
+			return
+		return User.query.get(id)
+
 	#打印类的对象
 	def __repr__(self):
 		return '<User {}>'.format(self.username)

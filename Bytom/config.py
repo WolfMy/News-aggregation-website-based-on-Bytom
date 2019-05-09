@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-05-03 22:27:05
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-08 10:46:34
+# @Last Modified time: 2019-05-09 11:26:24
 import os
 class Config:
 	#首先去读取环境变量的值，如果没有，则使用硬编码字符串作为替代
@@ -15,3 +15,10 @@ class Config:
 	
 	SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 	SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+	MAIL_SERVER = os.environ.get('MAIL_SERVER')
+	MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+	MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+	MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+	ADMINS = ['435212619@qq.com']

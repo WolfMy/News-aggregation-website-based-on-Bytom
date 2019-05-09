@@ -2,16 +2,17 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:56:18
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-09 02:25:55
+# @Last Modified time: 2019-05-09 14:31:00
 from app import app
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask_pymongo import PyMongo,DESCENDING,ASCENDING
 from flask_login import login_user, logout_user, current_user, login_required
-from app.forms import LoginForm,RegistrationForm
+from app.forms import LoginForm,RegistrationForm,ResetPasswordRequestForm,ResetPasswordForm
 from app import app, mongo,db
 from app.models import User
 from werkzeug.urls import url_parse
 from datetime import datetime
+from app.email import send_password_reset_email
 import re
 
 PERPAGE=20
@@ -55,15 +56,25 @@ class Paginate:
 @app.route('/')
 @app.route('/index')
 def index():
-	bilibili = mongo.db.bilibili.find()[:100]
-	github =  mongo.db.github.find()[:100]
-	huodongxing =  mongo.db.huodongxing.find()[:100]
-	jianshu = mongo.db.jianshu.find()[:100]
+	page = request.args.get('page', 1, type=int)
+	count = mongo.db.index.find().count()
+	items = Paginate(page,count)
+	if items.has_next:
+		next_url = url_for('index', page=items.nextnum)
+	else:
+		next_url = None
 
-	return render_template('index.html',items=bilibili)
+	if items.has_prev:
+		prev_url = url_for('index', page=items.prevnum)
+	else:
+		prev_url = None
+	index = mongo.db.index.find().sort([('title', DESCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
+	print(index)
+	return render_template('index.html',items = index,next_url=next_url,prev_url=prev_url)
 
 
 @app.route('/weibo')
+@login_required
 def weibo():
 	page = request.args.get('page', 1, type=int)
 	#总共的数据量
@@ -80,7 +91,6 @@ def weibo():
 		prev_url = None
 
 	weibo = mongo.db.weibo.find({"content":{"$exists":"true"},"$where":"(this.content.length > 30)"}).sort([('likenum', ASCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
-	print(type(weibo))
 	info = []
 	for one in weibo:
 		match = re.search(r"(【.*?】)(.*)(http:.{14})",one['content'])
@@ -101,6 +111,7 @@ def weibo():
 	return render_template('weibo.html',items=info,next_url=next_url,prev_url=prev_url)
 
 @app.route('/bilibili')
+@login_required
 def bilibili():                              
 	page = request.args.get('page', 1, type=int)
 	count = mongo.db.bilibili.find().count()
@@ -117,6 +128,7 @@ def bilibili():
 	return render_template('bilibili.html',items=bilibili,next_url=next_url,prev_url=prev_url)
 
 @app.route('/jianshu')
+@login_required
 def jianshu():
 	page = request.args.get('page', 1, type=int)
 	count = mongo.db.jianshu.find().count()
@@ -133,6 +145,7 @@ def jianshu():
 	return render_template('jianshu.html',items=jianshu,next_url=next_url,prev_url=prev_url)
 
 @app.route('/huodongxing')
+@login_required
 def huodongxing():
 	page = request.args.get('page', 1, type=int)
 	count = mongo.db.huodongxing.find().count()
@@ -149,6 +162,26 @@ def huodongxing():
 		prev_url = None
 	huodongxing = mongo.db.huodongxing.find().sort([('datestamp', ASCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
 	return render_template('huodongxing.html',items=huodongxing,next_url=next_url,prev_url=prev_url)
+
+@app.route('/github')
+@login_required
+def github():
+	page = request.args.get('page', 1, type=int)
+	count = mongo.db.github.find().count()
+	items = Paginate(page,count)
+	count = mongo.db.github.find().count()
+	if items.has_next:
+		next_url = url_for('github', page=items.nextnum)
+	else:
+		next_url = None
+
+	if items.has_prev:
+		prev_url = url_for('github', page=items.prevnum)
+	else:
+		prev_url = None
+	github = mongo.db.github.find().sort([('datestamp', ASCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
+	return render_template('github.html',items=github,next_url=next_url,prev_url=prev_url)
+
 
 
 @app.route('/login', methods = ['GET', 'POST'])
@@ -199,3 +232,32 @@ def register():
 		flash('Congratulations, you are now a registered user!')
 		return redirect(url_for('login'))
 	return render_template('register.html', title='Register', form=form)
+
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+        flash('Check your email for the instructions to reset your password')
+        return redirect(url_for('login'))
+    return render_template('reset_password_request.html',
+                           title='Reset Password', form=form)
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('index'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your password has been reset.')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', form=form)

@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:55:45
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-08 11:54:28
+# @Last Modified time: 2019-05-09 10:59:44
 from flask import Flask
 from config import Config
 from flask_pymongo import PyMongo
@@ -11,6 +11,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from logging.handlers import SMTPHandler,RotatingFileHandler
+from flask_mail import Mail
 import logging
 import os
 
@@ -29,7 +30,7 @@ mongo = PyMongo(app)
 bootstrap = Bootstrap(app)
 migrate = Migrate(app,db)
 #从app包导入views模块 views.py
-
+mail = Mail(app)
 #Flask-Login 需要知道哪个视图允许用户登录
 login_manager = LoginManager(app)
 #login 是登录视图的函数名·
