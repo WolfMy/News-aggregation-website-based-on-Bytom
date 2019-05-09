@@ -1,5 +1,20 @@
 {% extends "base.html" %}
-
+{% import 'bootstrap/wtf.html' as wtf %}
 {% block app_content %}
-<p>Welcome</p>		
+	{% if current_user.is_anonymous %}
+		<h4>Welcome to talkIsCheap!</h4>
+		<p>You can login for more information</p>
+	{% else %}
+		<h1>Hi, {{ current_user.username }}!</h1>
+	{% endif %}
+	{% if form %}
+		{{ wtf.quick_form(form) }}
+		<br>
+	{% endif %}
+	{% for item in items %}
+		<div>
+			<span><a href="{{ item.url }}" style="color:black" ><br>{{item.title}}</a></span>
+			<span class="label label-success" >{{item.datasrc}}</span>
+		</div>
+	{% endfor %}
 {% endblock %}

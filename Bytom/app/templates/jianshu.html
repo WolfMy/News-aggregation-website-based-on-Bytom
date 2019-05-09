@@ -2,11 +2,20 @@
 {% block app_content %}
 	{% for item in items %}
 		<div>
-			<span class="glyphicon glyphicon-bitcoin">
-				<a href="{{ item.url }}">{{ item.title }}</a>
-			</span>
 			<div>
-				<span class="glyphicon glyphicon-play">{{ item.playnum }}</span>
+				<div>
+				<a href="{{ item.url }}"><br><h5 style="color:black">{{item.title}}</h5></a>
+				</div>
+				<p class="small" style="color: gray">{{item.describe[:50]}}...</p>
+			</div>
+			<div>
+				<span class="glyphicon small glyphicon-play"></span>
+				<small>{{ item.playnum }}</small>
+				<span class="glyphicon small glyphicon-thumbs-up"></span>
+				<small>{{ item.favorite }}</small>
+				<span class="glyphicon small glyphicon-comment"></span>
+				<small>{{ item.commentnum }}</small>
+				<span class="small">Update:{{item.timestamp}}</span>
 			</div>
 		</div>
 	{% endfor %}
