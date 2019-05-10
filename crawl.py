@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-04-27 19:31:14
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-09 13:28:46
+# @Last Modified time: 2019-05-10 15:51:48
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -61,7 +61,7 @@ for one in zip(titles,describes,language,urls,timestamp):
 		"timestamp":one[4],
 		"datasrc":"GITHUB"
 	})
-# print(data)
+print(data)
 # data = json.dumps(data)
 # for one in data:
 # 	github.insert_one(one)
@@ -73,7 +73,7 @@ url = urls[0]
 headers = {
 	'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
 }
-BASEURL = "https://www.jianshu.com/"
+BASEURL = "https://www.jianshu.com"
 for url in urls:
 	response = requests.get(url,headers=headers)
 	soup = BeautifulSoup(response.text,'lxml')
@@ -87,17 +87,17 @@ for url in urls:
 		favorite = one.find(class_="meta").find('span').text.strip()
 		timestamp = one.find(class_="time").get("data-shared-at").split('T')[0]
 		data = {
-	 		"title": title,
-	 		"url": BASEURL+link,
-	 		"describe": describe,
-	 		"playnum":playnum,
-	 		"commentnum":commentnum,
-	 		"favorite":favorite,
-	 		'timestamp':timestamp,
+			"title": title,
+			"url": BASEURL+link,
+			"describe": describe,
+			"playnum":playnum,
+			"commentnum":commentnum,
+			"favorite":favorite,
+			'timestamp':timestamp,
 			"datasrc":"简书"
 
-	 	}
-
+		}
+		print(data)
 		# jianshu.insert_one(data)
 		index.insert_one(data)		
 
