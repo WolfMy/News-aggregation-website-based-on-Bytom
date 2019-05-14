@@ -27,6 +27,7 @@
                 {% if current_user.is_anonymous %}
                     <li  role="presentation"><a href="{{ url_for('login') }}">Login </a></li>
                 {% else %}
+                    <li  role="presentation"><a href="{{ url_for('user',username=current_user.username) }}">个人收藏</a></li>
                     <li ><a href="{{ url_for('logout') }}">Logout</a></li>
                 {% endif %}
             </ul>
@@ -37,9 +38,15 @@
     <div class="container">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% for message in messages%}
+                <div class="alert alert-warning alert-dismissible show" role="alert">
+                    <strong>{{ message }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
             {% endfor %}
+
         {% endif %}
     {% endwith %}
     {# application content needs to be provided in the app_content block #}
@@ -56,9 +63,8 @@
         </ul>
     </nav>
     <footer class="bottom">
-  <div class="container">
-      &copy; 2019 talkIsCheap
- </div>
-</footer>
-
+        <div class="container">
+            &copy; 2019 talkIsCheap
+        </div>
+    </footer>
 {% endblock %}

@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:56:18
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-09 14:31:00
+# @Last Modified time: 2019-05-13 23:46:22
 from app import app
 from flask import render_template, flash, redirect, session, url_for, request, g
 from flask_pymongo import PyMongo,DESCENDING,ASCENDING
@@ -69,8 +69,11 @@ def index():
 	else:
 		prev_url = None
 	index = mongo.db.index.find().sort([('title', DESCENDING)]).skip(PERPAGE*(page-1)).limit(PERPAGE)
-	print(index)
-	return render_template('index.html',items = index,next_url=next_url,prev_url=prev_url)
+	if current_user.is_authenticated:
+		collections = eval(current_user.collection)
+	else:
+		collections = "[]"
+	return render_template('index.html',items = index,collections=collections,next_url=next_url,prev_url=prev_url)
 
 
 @app.route('/weibo')
@@ -224,7 +227,7 @@ def register():
 		return redirect(url_for('index'))
 	form = RegistrationForm()
 	if form.validate_on_submit():
-		user = User(username=form.username.data, email=form.email.data)
+		user = User(username=form.username.data, email=form.email.data,collection="[]")
 		#手动将输入密码放入数据库中
 		user.set_password(form.password.data)
 		db.session.add(user)
@@ -235,29 +238,59 @@ def register():
 
 @app.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    form = ResetPasswordRequestForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            send_password_reset_email(user)
-        flash('Check your email for the instructions to reset your password')
-        return redirect(url_for('login'))
-    return render_template('reset_password_request.html',
-                           title='Reset Password', form=form)
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	form = ResetPasswordRequestForm()
+	if form.validate_on_submit():
+		user = User.query.filter_by(email=form.email.data).first()
+		if user:
+			send_password_reset_email(user)
+		flash('Check your email for the instructions to reset your password')
+		return redirect(url_for('login'))
+	return render_template('reset_password_request.html',
+						   title='Reset Password', form=form)
 
 @app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('index'))
-    user = User.verify_reset_password_token(token)
-    if not user:
-        return redirect(url_for('index'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash('Your password has been reset.')
-        return redirect(url_for('login'))
-    return render_template('reset_password.html', form=form)
+	if current_user.is_authenticated:
+		return redirect(url_for('index'))
+	user = User.verify_reset_password_token(token)
+	if not user:
+		return redirect(url_for('index'))
+	form = ResetPasswordForm()
+	if form.validate_on_submit():
+		user.set_password(form.password.data)
+		db.session.commit()
+		flash('Your password has been reset.')
+		return redirect(url_for('login'))
+	return render_template('reset_password.html', form=form)
+
+@app.route('/collect/<title>')
+@login_required
+def collect(title):
+	if not current_user.is_collected(title):
+		current_user.collect(title)
+	# db.session.commit()
+	flash('收藏成功')
+	return redirect(url_for('index'))
+
+@app.route('/uncollect/<title>')
+@login_required
+def uncollect(title):
+	if  current_user.is_collected(title):
+		current_user.uncollect(title)
+	# db.session.commit()
+	flash('取消成功')
+	return redirect(url_for('index'))
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+	user = User.query.filter_by(username=username).first_or_404()
+	collections = eval(user.collection)
+
+	items = []
+	for i in collections:
+		items.append(mongo.db.index.find_one({"title":i}))
+	print(items)
+	return render_template('user.html',user=user,items =items)

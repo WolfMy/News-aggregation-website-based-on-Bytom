@@ -6,6 +6,7 @@
 		<p>You can login for more information</p>
 	{% else %}
 		<h1>Hi, {{ current_user.username }}!</h1>
+		<h6><strong>点击星星可以收藏</strong></h6>
 	{% endif %}
 	{% if form %}
 		{{ wtf.quick_form(form) }}
@@ -13,8 +14,13 @@
 	{% endif %}
 	{% for item in items %}
 		<div>
-			<span><a href="{{ item.url }}" style="color:black" ><br>{{item.title}}</a></span>
+			<span><a href="{{ item.url }}" style="color:black" ><br>{{ item.title }}</a></span>
 			<span class="label label-success" >{{item.datasrc}}</span>
+			{% if not item.title in collections %}
+			<a class="glyphicon glyphicon-star-empty" href="{{ url_for('collect',title=item.title)}}"></a>
+			{% else %}
+			<a class="glyphicon glyphicon-star" href="{{ url_for('uncollect',title=item.title)}}"></a>
+			{% endif %}
 		</div>
 	{% endfor %}
 {% endblock %}

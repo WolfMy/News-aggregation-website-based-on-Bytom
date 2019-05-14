@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% block app_content %}
+	
+	<h1>Hi, {{ current_user.username }}!</h1>
+	{% for item in items %}
+		<div>
+			<span><a href="{{ item.url }}" style="color:black" ><br>{{ item.title }}</a></span>
+			<span class="label label-success" >{{ item.datasrc }}</span>
+		</div>
+	{% endfor %}
+{% endblock %}

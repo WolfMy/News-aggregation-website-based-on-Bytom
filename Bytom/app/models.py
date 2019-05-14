@@ -2,7 +2,7 @@
 # @Author: TD21forever
 # @Date:   2019-05-01 15:59:38
 # @Last Modified by:   TD21forever
-# @Last Modified time: 2019-05-09 11:25:36
+# @Last Modified time: 2019-05-13 22:45:25
 # from app import db
 
 from datetime import datetime
@@ -22,6 +22,8 @@ class User(UserMixin,db.Model):
 	username = db.Column(db.String(64),index=True,unique=True)
 	email = db.Column(db.String(120),index=True,unique=True)
 	password_hash = db.Column(db.String(128))
+	collection = db.Column(db.String(999))
+
 	#relationship在一对多的一这一侧定义
 							#表示‘多’方面的类
 	# posts = db.relationship('Post',backref='author',lazy='dynamic')
@@ -35,19 +37,19 @@ class User(UserMixin,db.Model):
 	# secondaryjoin=(followers.c.followed_id == id),backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
 	# about_me = db.Column(db.String(140))
 	# last_seen = db.Column(db.DateTime, default=datetime.utcnow)
-	def get_reset_password_token(self, expires_in=600):
-		return jwt.encode(
-			{'reset_password': self.id, 'exp': time() + expires_in},
-			app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+	# def get_reset_password_token(self, expires_in=600):
+	# 	return jwt.encode(
+	# 		{'reset_password': self.id, 'exp': time() + expires_in},
+	# 		app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
 		
-	@staticmethod
-	def verify_reset_password_token(token):
-		try:
-			id = jwt.decode(token, app.config['SECRET_KEY'],
-							algorithms=['HS256'])['reset_password']
-		except:
-			return
-		return User.query.get(id)
+	# @staticmethod
+	# def verify_reset_password_token(token):
+	# 	try:
+	# 		id = jwt.decode(token, app.config['SECRET_KEY'],
+	# 						algorithms=['HS256'])['reset_password']
+	# 	except:
+	# 		return
+	# 	return User.query.get(id)
 
 	#打印类的对象
 	def __repr__(self):
@@ -58,6 +60,24 @@ class User(UserMixin,db.Model):
 
 	def check_password(self,password):
 		return check_password_hash(self.password_hash,password)
+
+	def collect(self,title):
+		tmp = eval(self.collection)
+		tmp.append(title)
+		self.collection = str(tmp)
+
+	def is_collected(self,title):
+		return title in eval(self.collection)
+
+	def uncollect(self,title):
+		tmp = eval(self.collection)
+		tmp.remove(title)
+		self.collection = str(tmp)
+
+	# def show_collection_list(self):
+	# 	return self.collect_list
+
+
 
 	# def avatar(self,size):
 	# 	#先转成小写，再转为utf8
